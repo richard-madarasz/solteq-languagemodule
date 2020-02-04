@@ -1,1 +1,29 @@
-<h2>Welcome to Mageplaza.com!!!!!</h2>
+<?php
+
+/**
+ * @var \Solteq\TranslationManagement\Block\Index $block
+ */
+$languageFiles = $block->findLanguageFiles();
+?>
+
+<style>
+    table {  font-family: arial, sans-serif;  border-collapse: collapse;  width: 100%;  margin-top: 30px;}
+    td, th {  border: 1px solid #dddddd;  text-align: left;  padding: 8px;  }
+    tr:nth-child(even) { background-color: #dddddd; }
+    .post-name{width:30%}
+
+</style>
+<table>
+    <tr>
+        <th class="post-name">Name</th>
+        <th>Content</th>
+    </tr>
+    <?php
+    foreach ($languageFiles as $languages){
+        echo '<tr>
+                    <td>'.$languages.'</td>
+                    <td></td>
+                  </tr>';
+    }
+    ?>
+</table>
