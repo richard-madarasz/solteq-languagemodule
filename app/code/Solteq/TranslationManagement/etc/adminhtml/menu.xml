@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Solteq_TranslationManagement::translations" title="Manage Translation" module="Solteq_TranslationManagement" sortOrder="11" action="solteq_translationmanagement/translations/index" resource="Solteq_TranslationManagement::translations" parent="Magento_Backend::system_other_settings"/>
+    </menu>
+</config>
