@@ -4,26 +4,73 @@
  * @var \Solteq\TranslationManagement\Block\Index $block
  */
 $languageFiles = $block->findLanguageFiles();
+
+function runMyFunction() {
+    echo 'Hello';
+}
 ?>
 
+
+
 <style>
-    table {  font-family: arial, sans-serif;  border-collapse: collapse;  width: 100%;  margin-top: 30px;}
+    table {  font-family: arial, sans-serif;  border-collapse: collapse;  width: 40%;  margin-top: 30px;}
     td, th {  border: 1px solid #dddddd;  text-align: left;  padding: 8px;  }
     tr:nth-child(even) { background-color: #dddddd; }
     .post-name{width:30%}
+    .post-edit{width:10%}
 
 </style>
-<table>
-    <tr>
-        <th class="post-name">Name</th>
-        <th>Content</th>
-    </tr>
+
     <?php
-    foreach ($languageFiles as $languages){
-        echo '<tr>
-                    <td>'.$languages.'</td>
-                    <td></td>
-                  </tr>';
+
+    if (isset($_GET['file'])) {
+        echo $_GET['file']. "<br />\n";
+        if (($langFile = fopen($_GET['file'], "rw")) !== false) {
+            while (($data = fgetcsv($langFile,0,",")) !== false) {
+                $langArray[] = array(
+                    $data[0],
+                    $data[1]
+                );
+            }
+            echo '
+        <a href=\'?\'><button>Go back</button> </a>
+        <table>
+            <tr>
+                <th>String</th>
+                <th>Translation</th>
+               </tr>
+            <tr>
+        ';
+            for($i=0;$i<count($langArray);$i++){ //'.$block->getButtonHtml('completeAndRedirect(', $language).'
+                echo '
+                <td>'.$langArray[$i][0].'</td>
+                <td>'.$langArray[$i][1].'</td>
+            </tr>
+        ';
+            }
+            echo '</table>';
+            fclose($langFile);
+        }
+    }
+    else {
+        echo '
+        <table>
+            <tr>
+                <th class="post-name">Name</th>
+                <th class="post-edit">Content</th>
+               </tr>
+            <tr>
+        ';
+        foreach ($languageFiles as $language){ //'.$block->getButtonHtml('completeAndRedirect(', $language).'
+            echo '
+                <td>'.$language.'</td>
+                <td>
+                    <a href=\'?file='.$language.'\'><button>Edit</button> </a>
+                </td>
+            </tr>
+        ';
+        }
+        echo '</table>';
     }
     ?>
-</table>
+
