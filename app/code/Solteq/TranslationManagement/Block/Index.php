@@ -43,23 +43,26 @@ class Index extends \Magento\Framework\View\Element\Template
         return;
     }
 
-    /**
-     * Generate collect button html
-     *
-     * @return string
-     */
-    public function getButtonHtml($onclick, $lang)
-    {
-        $button = $this->getLayout()->createBlock(
-            'Magento\Backend\Block\Widget\Button'
-        )->setData(
-            [
-                'id' => 'collect_button',
-                'label' => __('Edit'),
-                'onclick' => $onclick . '"'. $lang.'")',
-            ]
-        );
+    function saveLanguageFile($arrayToSave, $languageFile) {
+        if (($langFile = fopen($languageFile, "w")) !== false) {
+            foreach ($arrayToSave as $lines) {
+                fputcsv($langFile, $lines);
+            }
+            fclose($langFile);
+        }
+        return;
+    }
 
-        return $button->toHtml();
+    function openLanguageFile($languageFile) {
+        if (($langFile = fopen($languageFile, "r")) !== false) {
+            while (($data = fgetcsv($langFile, 0, ",")) !== false) {
+                $langArray[] = array(
+                    $data[0],
+                    $data[1]
+                );
+            }
+            fclose($langFile);
+            return $langArray;
+        }
     }
 }

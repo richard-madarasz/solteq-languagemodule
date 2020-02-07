@@ -6,10 +6,6 @@
 $languageFiles = $block->findLanguageFiles();
 ?>
 <html>
-<head>
-    <script src="jquery.tabledit.min.js"></script>
-</head>
-
 <style>
     table {  font-family: arial, sans-serif;  border-collapse: collapse;  width: 40%;  margin-top: 30px;}
     td, th {  border: 1px solid #dddddd;  text-align: left;  padding: 8px;  }
@@ -20,43 +16,39 @@ $languageFiles = $block->findLanguageFiles();
 
 </style>
 <body>
-
-
     <?php
 
+    if (isset($_POST['editedArray'])) {
+        $block->saveLanguageFile($_POST['editedArray'], $_GET['file']);
+    }
+
+    // .csv file editor layout
     if (isset($_GET['file'])) {
-        echo $_GET['file']. "<br />\n";
-        if (($langFile = fopen($_GET['file'], "rw")) !== false) {
-            while (($data = fgetcsv($langFile,0,",")) !== false) {
-                $langArray[] = array(
-                    $data[0],
-                    $data[1]
-                );
+        $langArray = $block->openLanguageFile($_GET['file']);
+        if ($langArray !== 'error') {
+            echo '
+            <a href=\'?\'><button>Go back</button> </a>
+            <form method="post" action="">
+            <table id="editable_table">
+                <tr>
+                    <th>String</th>
+                    <th>Translation</th>
+                </tr>
+                <tr>';
+            for($i=0;$i<count($langArray);$i++){
+                echo '
+                    <td><input class="csv-field" type="text" name="editedArray['.$i.'][0]" value="'.$langArray[$i][0].'"></td>
+                    <td><input class="csv-field" type="text" name="editedArray['.$i.'][1]" value="'.$langArray[$i][1].'"></td>
+                </tr>';
             }
             echo '
-        <a href=\'?\'><button>Go back</button> </a>
-        <form method="post" action="">
-        <table id="editable_table">
-            <tr>
-                <th>String</th>
-                <th>Translation</th>
-               </tr>
-            <tr>
-        ';
-            for($i=0;$i<count($langArray);$i++){ //'.$block->getButtonHtml('completeAndRedirect(', $language).'
-                echo '
-                <td><input class="csv-field" type="text" name="'.$i.'-0" value="'.$langArray[$i][0].'"></td>
-                <td><input class="csv-field" type="text" name="'.$i.'-1" value="'.$langArray[$i][1].'"></td>
-            </tr>
-        ';
-            }
-            echo '</table>
-                    <input type="hidden" name="form_key" value="'.$block->getFormKey().'" />
-                    <input type="submit" value="Submit">
-                    </form>';
-            fclose($langFile);
+            </table>
+            <input type="hidden" name="form_key" value="'.$block->getFormKey().'" />
+            <input type="submit" value="Submit">
+            </form>';
         }
     }
+    // .csv file list layout
     else {
         echo '
         <table>
@@ -64,16 +56,14 @@ $languageFiles = $block->findLanguageFiles();
                 <th class="post-name">Name</th>
                 <th class="post-edit">Content</th>
                </tr>
-            <tr>
-        ';
-        foreach ($languageFiles as $language){ //'.$block->getButtonHtml('completeAndRedirect(', $language).'
+            <tr>';
+        foreach ($languageFiles as $language){
             echo '
                 <td>'.$language.'</td>
                 <td>
                     <a href=\'?file='.$language.'\'><button>Edit</button> </a>
                 </td>
-            </tr>
-        ';
+            </tr>';
         }
         echo '</table>';
     }
