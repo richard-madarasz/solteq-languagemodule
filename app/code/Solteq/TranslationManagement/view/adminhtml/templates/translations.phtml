@@ -23,12 +23,12 @@ $languageFiles = $block->findLanguageFiles();
     }
 
     // .csv file editor layout
-    if (isset($_GET['file'])) {
-        $langArray = $block->openLanguageFile($_GET['file']);
+    if (isset($_POST['lang_file'])) {
+        $langArray = $block->openLanguageFile($_POST['lang_file']);
         if ($langArray !== 'error') {
             echo '
-            <a href=\'?\'><button>Go back</button> </a>
-            <form method="post" action="">
+            <a href=""><button>Go back</button> </a>
+            <form method="post">
             <table id="editable_table">
                 <tr>
                     <th>String</th>
@@ -61,7 +61,11 @@ $languageFiles = $block->findLanguageFiles();
             echo '
                 <td>'.$language.'</td>
                 <td>
-                    <a href=\'?file='.$language.'\'><button>Edit</button> </a>
+                    <form method="post">
+                        <input type="hidden" name="lang_file" value="'.$language.'">
+                        <input type="hidden" name="form_key" value="'.$block->getFormKey().'" />
+                        <input type="submit" value="Edit">
+                    </form>
                 </td>
             </tr>';
         }
