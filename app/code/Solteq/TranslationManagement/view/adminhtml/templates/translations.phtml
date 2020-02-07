@@ -20,11 +20,9 @@ $languageFiles = $block->findLanguageFiles();
     $currentFile;
     if (isset($_POST['lang_file'])) {
         $currentFile = $_POST['lang_file'];
-        echo $currentFile;
     }
 
     if (isset($_POST['editedArray'])) {
-        echo 'IIIIIIIIIIIII';
         //$block->saveLanguageFile($_POST['editedArray'], '/var/www/helloworld/app/code/Mageplaza/HelloWorld/i18n/hu_HU.csv');
         echo $block->saveLanguageFile($_POST['editedArray'], $_POST['lang_file']);
     }
