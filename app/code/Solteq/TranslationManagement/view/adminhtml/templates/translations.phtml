@@ -17,9 +17,16 @@ $languageFiles = $block->findLanguageFiles();
 </style>
 <body>
     <?php
+    $currentFile;
+    if (isset($_POST['lang_file'])) {
+        $currentFile = $_POST['lang_file'];
+        echo $currentFile;
+    }
 
     if (isset($_POST['editedArray'])) {
-        $block->saveLanguageFile($_POST['editedArray'], $_GET['file']);
+        echo 'IIIIIIIIIIIII';
+        //$block->saveLanguageFile($_POST['editedArray'], '/var/www/helloworld/app/code/Mageplaza/HelloWorld/i18n/hu_HU.csv');
+        echo $block->saveLanguageFile($_POST['editedArray'], $_POST['lang_file']);
     }
 
     // .csv file editor layout
@@ -27,8 +34,8 @@ $languageFiles = $block->findLanguageFiles();
         $langArray = $block->openLanguageFile($_POST['lang_file']);
         if ($langArray !== 'error') {
             echo '
-            <a href=""><button>Go back</button> </a>
-            <form method="post">
+            <a href=\'?\'><button>Go back</button> </a>
+            <form method="post" action="">
             <table id="editable_table">
                 <tr>
                     <th>String</th>
@@ -44,6 +51,7 @@ $languageFiles = $block->findLanguageFiles();
             echo '
             </table>
             <input type="hidden" name="form_key" value="'.$block->getFormKey().'" />
+            <input type="hidden" name="lang_file" value="'.$currentFile.'" />
             <input type="submit" value="Submit">
             </form>';
         }
@@ -61,11 +69,12 @@ $languageFiles = $block->findLanguageFiles();
             echo '
                 <td>'.$language.'</td>
                 <td>
-                    <form method="post">
+                    <form method="post" action="">
                         <input type="hidden" name="lang_file" value="'.$language.'">
                         <input type="hidden" name="form_key" value="'.$block->getFormKey().'" />
                         <input type="submit" value="Edit">
                     </form>
+                    <!-- <a href=\'?file='.$language.'\'><button>Edit</button> </a> -->
                 </td>
             </tr>';
         }

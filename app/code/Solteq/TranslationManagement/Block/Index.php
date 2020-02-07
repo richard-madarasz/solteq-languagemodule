@@ -50,7 +50,7 @@ class Index extends \Magento\Framework\View\Element\Template
             }
             fclose($langFile);
         }
-        return;
+        return $arrayToSave[0][0];
     }
 
     function openLanguageFile($languageFile) {
@@ -62,7 +62,7 @@ class Index extends \Magento\Framework\View\Element\Template
                 );
             }
             fclose($langFile);
-            return $langArray;
         }
+        return $langArray;
     }
 }
