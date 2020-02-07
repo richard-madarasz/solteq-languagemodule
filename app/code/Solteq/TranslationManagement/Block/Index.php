@@ -2,7 +2,22 @@
 namespace Solteq\TranslationManagement\Block;
 class Index extends \Magento\Framework\View\Element\Template
 {
+    public function __construct(
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Mageplaza\HelloWorld\Model\PostFactory $postFactory,
+        \Magento\Framework\Data\Form\FormKey $formKey
+    )
+    {
+        $this->_postFactory = $postFactory;
+        $this->formKey = $formKey;
+        parent::__construct($context);
+    }
     protected $_languageFiles = [];
+
+    public function getFormKey()
+    {
+        return $this->formKey->getFormKey();
+    }
 
     public function findLanguageFiles()
     {
