@@ -126,10 +126,13 @@ $languageFiles = $block->findLanguageFiles();
 <body>
 
     <?php
-    //.csv-field{border: none; width: 100%; background: none;}
-    $currentFile;
+    $currentFile = "";
     if (isset($_POST['lang_file'])) {
         $currentFile = $_POST['lang_file'];
+    }
+
+    if (isset($_POST['new_line'])) {
+        $block->newLine($currentFile);
     }
 
     if (isset($_POST['editedArray'])) {
@@ -148,6 +151,12 @@ $languageFiles = $block->findLanguageFiles();
                     <div class="page-actions" data-ui-id="page-actions-toolbar-content-header">
                         <div class="page-actions-inner" data-title="Edit translations">
                         
+                            <form id="new-line" method="post" action="">
+                                <input type="hidden" name="new_line" value="Add" />
+                                <input type="hidden" name="lang_file" value="' . $currentFile . '" />
+                                <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
+                            </form>
+                        
                             <form method="post" action="">
                                 <select name="lang_file" onchange="this.form.submit()">
                                 <option value="">'.$currentFile.'</option>';
@@ -165,14 +174,14 @@ $languageFiles = $block->findLanguageFiles();
                                 <button id="back" type="button" class="action-default scalable back" data-ui-id="attribute-edit-content-back-button" onclick="location.href=\'?\'">
                                     <span>Back</span>
                                 </button>
-                                <form method="post" action="">
-                                <button id="save" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="Save Attribute" type="submit" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
+                                
+                                <button id="save" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="Save Attribute" type="submit" form="save-edit" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
                                     <span class="ui-button-text">
                                         <!-- <input type="submit" value="Submit"> -->Save
                                     </span>
                                 </button>
                                 
-                                <button value="langTable" onclick="addRow()" id="new_line" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="New Line" type="button" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
+                                <button value="langTable" onclick="addRow()" id="new_line" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="New Line" type="submit" form="new-line" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
                                     <span class="ui-button-text">
                                         <span>New Line</span>
                                     </span>
@@ -188,7 +197,8 @@ $languageFiles = $block->findLanguageFiles();
                     <th>String</th>
                     <th>Translation</th>
                 </tr>
-                <tr>';
+                <tr>
+                <form id="save-edit" method="post" action="">';
             for($i=0;$i<count($langArray);$i++){
                 echo '
                     <td><input class="csv-field" type="text" name="editedArray['.$i.'][0]" value="'.$langArray[$i][0].'"></td>

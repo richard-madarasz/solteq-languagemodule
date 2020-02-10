@@ -53,6 +53,14 @@ class Index extends \Magento\Framework\View\Element\Template
         return;
     }
 
+    function newLine($languageFile) {
+        if (($langFile = fopen($languageFile, "a")) !== false) {
+            fputcsv($langFile, ["New string","New translation"], ",");
+            fclose($langFile);
+        }
+        return;
+    }
+
     function openLanguageFile($languageFile) {
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
