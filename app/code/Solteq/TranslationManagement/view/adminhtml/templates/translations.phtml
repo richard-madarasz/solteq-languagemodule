@@ -120,7 +120,9 @@ $languageFiles = $block->findLanguageFiles();
     tr:nth-child(even) { background-color: #dddddd; }
     .post-name{width:30%}
     .post-edit{width:10%}
+    .delete-col {width: 5%}
     .csv-field{border: none; width: 100%; background: none;}
+    .file-selector{display: inline;}
 </style>
 
 <body>
@@ -135,14 +137,16 @@ $languageFiles = $block->findLanguageFiles();
         $block->newLine($currentFile);
     }
 
+    if (isset($_POST['delete_line'])) {
+        $block->deleteLine($currentFile, $_POST['delete_line']);
+    }
+
     if (isset($_POST['editedArray'])) {
         $block->saveLanguageFile($_POST['editedArray'], $_POST['lang_file']);
     }
 
     // .csv file editor layout
-    if (isset($_POST['lang_file'])) {
-        $langArray = $block->openLanguageFile($_POST['lang_file']);
-        if ($langArray !== 'error') {
+
             echo '
             
             
@@ -151,13 +155,9 @@ $languageFiles = $block->findLanguageFiles();
                     <div class="page-actions" data-ui-id="page-actions-toolbar-content-header">
                         <div class="page-actions-inner" data-title="Edit translations">
                         
-                            <form id="new-line" method="post" action="">
-                                <input type="hidden" name="new_line" value="Add" />
-                                <input type="hidden" name="lang_file" value="' . $currentFile . '" />
-                                <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
-                            </form>
+                           
                         
-                            <form method="post" action="">
+                            <form method="post" action="" class="file-selector">
                                 <select name="lang_file" onchange="this.form.submit()">
                                 <option value="">'.$currentFile.'</option>';
                                     foreach ($languageFiles as $language) {
@@ -171,17 +171,13 @@ $languageFiles = $block->findLanguageFiles();
                              
                             <div class="page-actions-buttons">
                                 
-                                <button id="back" type="button" class="action-default scalable back" data-ui-id="attribute-edit-content-back-button" onclick="location.href=\'?\'">
-                                    <span>Back</span>
-                                </button>
-                                
                                 <button id="save" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="Save Attribute" type="submit" form="save-edit" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
                                     <span class="ui-button-text">
-                                        <!-- <input type="submit" value="Submit"> -->Save
+                                        Save
                                     </span>
                                 </button>
                                 
-                                <button value="langTable" onclick="addRow()" id="new_line" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="New Line" type="submit" form="new-line" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
+                                <button value="langTable" id="new_line" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="New Line" type="submit" form="new-line" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
                                     <span class="ui-button-text">
                                         <span>New Line</span>
                                     </span>
@@ -189,13 +185,26 @@ $languageFiles = $block->findLanguageFiles();
                             </div>
                         </div>
                     </div>
-                </div>
-            <!-- <a href=\'?\'><button>Go back</button> </a> -->
-            
+                </div> ';
+            if (isset($_POST['lang_file'])) {
+        $langArray = $block->openLanguageFile($_POST['lang_file']);
+        if ($langArray !== 'error') {
+            echo '
+                <form id="new-line" method="post" action="">
+                    <input type="hidden" name="new_line" value="Add" />
+                    <input type="hidden" name="lang_file" value="' . $currentFile . '" />
+                    <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
+                </form>
+                
+                <form id="delete-line" method="post" action="">
+                    <input type="hidden" name="lang_file" value="' . $currentFile . '" />
+                    <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
+                </form>
             <table id="editable_table">
                 <tr>
                     <th>String</th>
                     <th>Translation</th>
+                    <th class="delete-col"></th>
                 </tr>
                 <tr>
                 <form id="save-edit" method="post" action="">';
@@ -203,6 +212,7 @@ $languageFiles = $block->findLanguageFiles();
                 echo '
                     <td><input class="csv-field" type="text" name="editedArray['.$i.'][0]" value="'.$langArray[$i][0].'"></td>
                     <td><input class="csv-field" type="text" name="editedArray['.$i.'][1]" value="'.$langArray[$i][1].'"></td>
+                    <td><button type="submit" name="delete_line" form="delete-line" value="'.$langArray[$i][0].'">DEL</button></td>
                 </tr>';
             }
             echo '
@@ -212,30 +222,6 @@ $languageFiles = $block->findLanguageFiles();
             </form>';
         }
     }
-    // .csv file list layout
-    else {
-        echo '
-        <table>
-            <tr>
-                <th class="post-name">Name</th>
-                <th class="post-edit">Content</th>
-               </tr>
-            <tr>';
-        foreach ($languageFiles as $language){
-            echo '
-                <td>'.$language.'</td>
-                <td>
-                    <form method="post" action="">
-                        <input type="hidden" name="lang_file" value="'.$language.'">
-                        <input type="hidden" name="form_key" value="'.$block->getFormKey().'" />
-                        <input type="submit" value="Edit">
-                    </form>
-                    <!-- <a href=\'?file='.$language.'\'><button>Edit</button> </a> -->
-                </td>
-            </tr>';
-        }
-        echo '</table>';
-    }
     ?>
-</body>
+    </body>
 </html>

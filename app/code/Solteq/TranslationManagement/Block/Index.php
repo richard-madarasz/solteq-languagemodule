@@ -61,6 +61,21 @@ class Index extends \Magento\Framework\View\Element\Template
         return;
     }
 
+    function deleteLine($languageFile, $lineToDelete) {
+        if (($langFile = fopen($languageFile, "r")) !== false) {
+            while (($data = fgetcsv($langFile, 0, ",")) !== false) {
+                if ($data[0] != $lineToDelete) {
+                    $langArray[] = array(
+                        $data[0],
+                        $data[1]
+                    );
+                }
+            }
+            fclose($langFile);
+        }
+        $this->saveLanguageFile($langArray, $languageFile);
+    }
+
     function openLanguageFile($languageFile) {
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
