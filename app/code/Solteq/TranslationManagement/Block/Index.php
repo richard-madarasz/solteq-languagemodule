@@ -22,7 +22,7 @@ class Index extends \Magento\Framework\View\Element\Template
     public function findLanguageFiles()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList')->getRoot() . '/app/code';
+        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList')->getRoot() . '/app';
         $this->listFolderFiles($directory);
         return $this->_languageFiles;
     }
@@ -97,7 +97,16 @@ class Index extends \Magento\Framework\View\Element\Template
             'sv_SE.csv' => 'Swedish',
             'pl_PL.csv' => 'Polish',
         );
-        return $nameList[substr($languageFile, -9)];
-        return $languageFile;
+        if (strpos($languageFile, '/code')) {
+            $split = explode('app/code/', $languageFile);
+            $split = explode('/', $split[1]);
+            return 'Module: ' . $split[0] . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
+        }
+        else if (strpos($languageFile, '/design')) {
+            $split = explode('app/design/', $languageFile);
+            $split = explode('/', $split[1]);
+            return 'Design: ' . ucfirst($split[0]) . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
+        }
+        return;
     }
 }
