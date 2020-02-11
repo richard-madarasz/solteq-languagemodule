@@ -88,4 +88,16 @@ class Index extends \Magento\Framework\View\Element\Template
         }
         return $langArray;
     }
+
+    function languageFileToName($languageFile) {
+        $nameList = array(
+            'en_US.csv' => 'English',
+            'fi_FI.csv' => 'Finnish',
+            'hu_HU.csv' => 'Hungarian',
+            'sv_SE.csv' => 'Swedish',
+            'pl_PL.csv' => 'Polish',
+        );
+        return $nameList[substr($languageFile, -9)];
+        return $languageFile;
+    }
 }
