@@ -1,18 +1,20 @@
 <?php
+
 namespace Solteq\TranslationManagement\Block;
+
 class Index extends \Magento\Framework\View\Element\Template
 {
+    protected $_languageFiles = [];
+
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Mageplaza\HelloWorld\Model\PostFactory $postFactory,
         \Magento\Framework\Data\Form\FormKey $formKey
-    )
-    {
+    ) {
         $this->_postFactory = $postFactory;
         $this->formKey = $formKey;
         parent::__construct($context);
     }
-    protected $_languageFiles = [];
 
     public function getFormKey()
     {
@@ -43,25 +45,17 @@ class Index extends \Magento\Framework\View\Element\Template
         return;
     }
 
-    function saveLanguageFile($arrayToSave, $languageFile) {
-        if (($langFile = fopen($languageFile, "w")) !== false) {
-            foreach ($arrayToSave as $lines) {
-                fputcsv($langFile, $lines);
-            }
-            fclose($langFile);
-        }
-        return;
-    }
-
-    function newLine($languageFile) {
+    function newLine($languageFile)
+    {
         if (($langFile = fopen($languageFile, "a")) !== false) {
-            fputcsv($langFile, ["New string","New translation"], ",");
+            fputcsv($langFile, ["New string", "New translation"], ",");
             fclose($langFile);
         }
         return;
     }
 
-    function deleteLine($languageFile, $lineToDelete) {
+    function deleteLine($languageFile, $lineToDelete)
+    {
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
                 if ($data[0] != $lineToDelete) {
@@ -76,7 +70,19 @@ class Index extends \Magento\Framework\View\Element\Template
         $this->saveLanguageFile($langArray, $languageFile);
     }
 
-    function openLanguageFile($languageFile) {
+    function saveLanguageFile($arrayToSave, $languageFile)
+    {
+        if (($langFile = fopen($languageFile, "w")) !== false) {
+            foreach ($arrayToSave as $lines) {
+                fputcsv($langFile, $lines);
+            }
+            fclose($langFile);
+        }
+        return;
+    }
+
+    function openLanguageFile($languageFile)
+    {
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
                 $langArray[] = array(
@@ -89,7 +95,8 @@ class Index extends \Magento\Framework\View\Element\Template
         return $langArray;
     }
 
-    function languageFileToName($languageFile) {
+    function languageFileToName($languageFile)
+    {
         $nameList = array(
             'en_US.csv' => 'English',
             'fi_FI.csv' => 'Finnish',
@@ -101,11 +108,12 @@ class Index extends \Magento\Framework\View\Element\Template
             $split = explode('app/code/', $languageFile);
             $split = explode('/', $split[1]);
             return 'Module: ' . $split[0] . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
-        }
-        else if (strpos($languageFile, '/design')) {
-            $split = explode('app/design/', $languageFile);
-            $split = explode('/', $split[1]);
-            return 'Design: ' . ucfirst($split[0]) . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
+        } else {
+            if (strpos($languageFile, '/design')) {
+                $split = explode('app/design/', $languageFile);
+                $split = explode('/', $split[1]);
+                return 'Design: ' . ucfirst($split[0]) . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
+            }
         }
         return;
     }
