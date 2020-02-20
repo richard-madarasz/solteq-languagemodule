@@ -2,17 +2,30 @@
 
 namespace Solteq\TranslationManagement\Block;
 
+use Magento\Framework\View\Element\Template\Context;
+use Mageplaza\HelloWorld\Model\PostFactory;
+use Magento\Framework\Data\Form\FormKey;
+use Magento\Framework\Filesystem\DirectoryList;
+
+/**
+ * @property PostFactory _postFactory
+ * @property FormKey formKey
+ * @property DirectoryList dir
+ */
+
 class Index extends \Magento\Framework\View\Element\Template
 {
     protected $_languageFiles = [];
 
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Mageplaza\HelloWorld\Model\PostFactory $postFactory,
-        \Magento\Framework\Data\Form\FormKey $formKey
+        Context $context,
+        PostFactory $postFactory,
+        FormKey $formKey,
+        DirectoryList $dir
     ) {
         $this->_postFactory = $postFactory;
         $this->formKey = $formKey;
+        $this->dir = $dir;
         parent::__construct($context);
     }
 
@@ -23,9 +36,7 @@ class Index extends \Magento\Framework\View\Element\Template
 
     public function findLanguageFiles()
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList')->getRoot() . '/app';
-        $this->listFolderFiles($directory);
+        $this->listFolderFiles($this->dir->getPath('app'));
         return $this->_languageFiles;
     }
 
