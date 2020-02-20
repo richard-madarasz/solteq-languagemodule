@@ -1,24 +1,13 @@
 <?php
 
 /**
- * @var \Solteq\TranslationManagement\Block\Index $block
+ * @var \Solteq\TranslationManagement\Block\Translation $block
  */
+//$languageFiles = $block->findLanguageFiles();
 $languageFiles = $block->findLanguageFiles();
 $currentFile = "";
 if (isset($_POST['lang_file'])) {
     $currentFile = $_POST['lang_file'];
-}
-
-if (isset($_POST['new_line'])) {
-    $block->newLine($currentFile);
-}
-
-if (isset($_POST['delete_line'])) {
-    $block->deleteLine($currentFile, $_POST['delete_line']);
-}
-
-if (isset($_POST['editedArray'])) {
-    $block->saveLanguageFile($_POST['editedArray'], $_POST['lang_file']);
 }
 ?>
 <html>

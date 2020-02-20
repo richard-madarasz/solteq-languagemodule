@@ -2,7 +2,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <block class="Solteq\TranslationManagement\Block\Index" name="solteq_translationsmanagement_translations_index" template="Solteq_TranslationManagement::translations.phtml" />
+            <block class="Solteq\TranslationManagement\Block\Translation" name="solteq_translationsmanagement_translations_translation" template="Solteq_TranslationManagement::translations.phtml" />
         </referenceContainer>
     </body>
 </page>

@@ -11,8 +11,8 @@ class Index extends Action
     protected $resultPageFactory = false;
 
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
@@ -20,10 +20,32 @@ class Index extends Action
 
     public function execute()
     {
-        $number = $this->getRequest()->getParam('number');
-
         $resultPage = $this->resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->prepend((__('Translations')));
+        $block = $this->resultPageFactory
+            ->create()
+            ->getLayout()
+            ->createBlock('Solteq\TranslationManagement\Block\Translation');
+
+        $postparams = [
+            'langFile' => $this->getRequest()->getParam('lang_file'),
+            'newLine' => $this->getRequest()->getParam('new_line'),
+            'deleteLine' => $this->getRequest()->getParam('delete_line'),
+            'editedArray' => $this->getRequest()->getParam('editedArray'),
+        ];
+
+        if(isset($postparams['newLine'])) {
+            $block->newLine($postparams['langFile']);
+        }
+
+        if(isset($postparams['deleteLine'])) {
+            $block->deleteLine($postparams['langFile'], $postparams['deleteLine']);
+        }
+
+        if(isset($postparams['editedArray'])) {
+            $block->saveLanguageFile($postparams['editedArray'],$postparams['langFile']);
+        }
+
 
         return $resultPage;
     }
