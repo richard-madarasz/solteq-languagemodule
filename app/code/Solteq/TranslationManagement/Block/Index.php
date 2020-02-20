@@ -6,6 +6,7 @@ use Magento\Framework\View\Element\Template\Context;
 use Mageplaza\HelloWorld\Model\PostFactory;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Filesystem\DirectoryList;
+use Magento\Framework\Registry;
 
 /**
  * @property PostFactory _postFactory
@@ -16,16 +17,19 @@ use Magento\Framework\Filesystem\DirectoryList;
 class Index extends \Magento\Framework\View\Element\Template
 {
     protected $_languageFiles = [];
+    protected $_currentFile;
 
     public function __construct(
         Context $context,
         PostFactory $postFactory,
         FormKey $formKey,
-        DirectoryList $dir
+        DirectoryList $dir,
+        Registry $registry
     ) {
         $this->_postFactory = $postFactory;
         $this->formKey = $formKey;
         $this->dir = $dir;
+        $this->registry = $registry;
         parent::__construct($context);
     }
 
@@ -127,5 +131,10 @@ class Index extends \Magento\Framework\View\Element\Template
             }
         }
         return;
+    }
+
+    public function getCurrentFile()
+    {
+        return $this->registry->registry('currentFile');
     }
 }

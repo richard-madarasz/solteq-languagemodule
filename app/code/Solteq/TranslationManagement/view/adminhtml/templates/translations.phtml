@@ -1,14 +1,10 @@
 <?php
 
 /**
- * @var \Solteq\TranslationManagement\Block\Translation $block
+ * @var \Solteq\TranslationManagement\Block\Index $block
  */
-//$languageFiles = $block->findLanguageFiles();
 $languageFiles = $block->findLanguageFiles();
-$currentFile = "";
-if (isset($_POST['lang_file'])) {
-    $currentFile = $_POST['lang_file'];
-}
+$currentFile = $block->getCurrentFile();
 ?>
 <html>
 <style>

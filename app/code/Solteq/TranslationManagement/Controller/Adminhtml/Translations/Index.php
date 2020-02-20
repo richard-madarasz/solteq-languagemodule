@@ -5,6 +5,7 @@ namespace Solteq\TranslationManagement\Controller\Adminhtml\Translations;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Registry;
 
 class Index extends Action
 {
@@ -12,9 +13,11 @@ class Index extends Action
 
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory
+        PageFactory $resultPageFactory,
+        Registry $registry
     ) {
         parent::__construct($context);
+        $this->registry = $registry;
         $this->resultPageFactory = $resultPageFactory;
     }
 
@@ -25,7 +28,7 @@ class Index extends Action
         $block = $this->resultPageFactory
             ->create()
             ->getLayout()
-            ->createBlock('Solteq\TranslationManagement\Block\Translation');
+            ->createBlock('Solteq\TranslationManagement\Block\Index');
 
         $postparams = [
             'langFile' => $this->getRequest()->getParam('lang_file'),
@@ -33,6 +36,10 @@ class Index extends Action
             'deleteLine' => $this->getRequest()->getParam('delete_line'),
             'editedArray' => $this->getRequest()->getParam('editedArray'),
         ];
+
+        if(isset($postparams['langFile'])) {
+            $this->registry->register('currentFile',$postparams['langFile']);
+        }
 
         if(isset($postparams['newLine'])) {
             $block->newLine($postparams['langFile']);
