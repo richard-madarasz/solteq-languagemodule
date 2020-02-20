@@ -40,8 +40,8 @@ echo '
             </div>
         </div>
     </div> ';
-if (isset($_POST['lang_file'])) {
-    $langArray = $block->openLanguageFile($_POST['lang_file']);
+if ($currentFile) {
+    $langArray = $block->openLanguageFile($currentFile);
     if ($langArray !== 'error') {
 echo '
     <form id="new-line" method="post" action="">
