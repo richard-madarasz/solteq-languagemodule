@@ -1,88 +1,77 @@
 <?php
-
 /**
  * @var \Solteq\TranslationManagement\Block\Index $block
  */
 $languageFiles = $block->findLanguageFiles();
 $currentFile = $block->getCurrentFile();
 ?>
-<html>
 <style>
     <?= include 'css/translations.css'; ?>
 </style>
 
-<body>
-<?php
-
-// .csv file editor layout
-echo '
-    <div class="page-main-actions sticky">
-        <div class="page-actions" data-ui-id="page-actions-toolbar-content-header">
-            <div class="page-actions-inner" data-title="Edit translations">
-                Selected language: 
-                <form method="post" action="" class="file-selector">
-                    <select name="lang_file" onchange="this.form.submit()">
-                        <option value="">'; if($currentFile != ""){echo $block->languageFileToName($currentFile);} else {echo 'Select a language';}  echo '</option>';
-                        foreach ($languageFiles as $language) { echo '
-                        <option value="' . $language . '">' . $block->languageFileToName($language) . '</option>';
-} echo '  
-                    </select>
-                    <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
-                </form>
-                <div class="page-actions-buttons">
-                    <button id="save" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="Save Attribute" type="submit" form="save-edit" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
-                        <span class="ui-button-text"> Save </span>
-                    </button>
-                    <button value="langTable" id="new_line" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="New Line" type="submit" form="new-line" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
-                        <span class="ui-button-text"> New Line </span>
-                    </button>
-                </div>
+<div class="page-main-actions sticky">
+    <div class="page-actions" data-ui-id="page-actions-toolbar-content-header">
+        <div class="page-actions-inner" data-title="Edit translations">
+            Selected language:
+            <form method="post" action="" class="file-selector">
+                <select name="lang_file" onchange="this.form.submit()">
+                    <option value=""> <?php if($currentFile != ""){echo $block->languageFileToName($currentFile);} else {echo 'Select a language';} ?> </option>
+                    <?php foreach ($languageFiles as $language) : ?>
+                        <option value="<?= $language ?>"> <?= $block->languageFileToName($language) ?> </option>
+                    <?php endforeach; ?>
+                </select>
+                <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>" />
+            </form>
+            <div class="page-actions-buttons">
+                <button id="save" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="Save Attribute" type="submit" form="save-edit" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
+                    <span class="ui-button-text"> Save </span>
+                </button>
+                <button value="langTable" id="new_line" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="New Line" type="submit" form="new-line" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
+                    <span class="ui-button-text"> New Line </span>
+                </button>
             </div>
         </div>
-    </div> ';
-if ($currentFile) {
-    $langArray = $block->openLanguageFile($currentFile);
-    if ($langArray !== 'error') {
-echo '
-    <form id="new-line" method="post" action="">
-        <input type="hidden" name="new_line" value="Add" />
-        <input type="hidden" name="lang_file" value="' . $currentFile . '" />
-        <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
-    </form>
-                
-    <form id="delete-line" method="post" action="">
-        <input type="hidden" name="lang_file" value="' . $currentFile . '" />
-        <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
-    </form>
-    
-    <table id="editable_table">
-        <tr>
-            <th>String</th>
-            <th>Translation</th>
-            <th class="delete-col"></th>
-        </tr>
-        <tr>
-            <form id="save-edit" method="post" action="">';
-                for ($i=0;$i<count($langArray);$i++) { echo '
-                <td>
-                    <input class="csv-field" type="text" name="editedArray[' . $i . '][0]" value="' . $langArray[$i][0] . '">
-                </td>
-                <td>
-                    <input class="csv-field" type="text" name="editedArray[' . $i . '][1]" value="' . $langArray[$i][1] . '">
-                </td>
-                <td>
-                    <button class="delete-button" title="Click to delete line" type="submit" name="delete_line" form="delete-line" value="' . $langArray[$i][0] . '">
-                        &#128465;
-                    </button>
-                </td>
-        </tr>'; } echo '
-                <input type="hidden" name="form_key" value="' . $block->getFormKey() . '" />
-                <input type="hidden" name="lang_file" value="' . $currentFile . '" />
-            </form>
+    </div>
+</div>
+<?php if ($currentFile) : ?>
+    <?php $langArray = $block->openLanguageFile($currentFile) ?>
+    <?php if ($langArray !== 'error') : ?>
+<form id="new-line" method="post" action="">
+    <input type="hidden" name="new_line" value="Add" />
+    <input type="hidden" name="lang_file" value="<?= $currentFile ?>" />
+    <input type="hidden" name="form_key" value="<?= $block->getFormKey()?>" />
+</form>
+
+<form id="delete-line" method="post" action="">
+    <input type="hidden" name="lang_file" value="<?= $currentFile ?>" />
+    <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>" />
+</form>
+
+<table id="editable_table">
+    <tr>
+        <th>String</th>
+        <th>Translation</th>
+        <th class="delete-col"></th>
+    </tr>
+        <form id="save-edit" method="post" action="">
+            <?php for ($i=0;$i<count($langArray);$i++) : ?>
+                <tr>
+                    <td>
+                        <input class="csv-field" type="text" name="editedArray[<?= $i ?>][0]" value="<?= $langArray[$i][0] ?>">
+                    </td>
+                    <td>
+                        <input class="csv-field" type="text" name="editedArray[<?= $i ?>][1]" value="<?= $langArray[$i][1] ?>">
+                    </td>
+                    <td>
+                        <button class="delete-button" title="Click to delete line" type="submit" name="delete_line" form="delete-line" value="<?= $langArray[$i][0] ?>">
+                            &#128465;
+                        </button>
+                    </td>
+                </tr>
+            <?php endfor; ?>
+            <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>" />
+            <input type="hidden" name="lang_file" value="<?= $currentFile ?>" />
+        </form>
     </table>
-    ';
-    }
-}
-?>
-</body>
-</html>
+    <?php endif; ?>
+<?php endif; ?>
