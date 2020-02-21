@@ -73,25 +73,24 @@ class Index extends \Magento\Framework\View\Element\Template
     {
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
-                if ($data[0] != $lineToDelete) {
-                    if(isset($data[2]) && isset($data[3])) {
-                        $langArray[] = array(
-                            $data[0],
-                            $data[1],
-                            $data[2],
-                            $data[3]
-                        );
-                    }
-                    else {
-                        $langArray[] = array(
-                            $data[0],
-                            $data[1],
-                        );
-                    }
+                if(isset($data[2]) && isset($data[3])) {
+                    $langArray[] = array(
+                        $data[0],
+                        $data[1],
+                        $data[2],
+                        $data[3]
+                    );
+                }
+                else {
+                    $langArray[] = array(
+                        $data[0],
+                        $data[1],
+                    );
                 }
             }
             fclose($langFile);
         }
+        unset($langArray[$lineToDelete]);
         $this->saveLanguageFile($langArray, $languageFile);
     }
 
@@ -108,6 +107,7 @@ class Index extends \Magento\Framework\View\Element\Template
 
     function openLanguageFile($languageFile)
     {
+        $langArray = [];
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
                 if(isset($data[2]) && isset($data[3])) {
@@ -150,7 +150,7 @@ class Index extends \Magento\Framework\View\Element\Template
         } else if (strpos($languageFile, '/i18n')) {
             $split = explode('app/i18n/', $languageFile);
             $split = explode('/', $split[1]);
-            return 'Main: ' . $nameList[substr($languageFile, -9)];
+            return 'Main Project Translation: ' . $nameList[substr($languageFile, -9)];
         }
         return;
     }
