@@ -15,7 +15,13 @@ $currentFile = $block->getCurrentFile();
             Selected language:
             <form method="post" action="" class="file-selector">
                 <select name="lang_file" onchange="this.form.submit()">
-                    <option value=""> <?php if($currentFile != ""){echo $block->languageFileToName($currentFile);} else {echo 'Select a language';} ?> </option>
+                    <option value="">
+                        <?php if ($currentFile != ""): ?>
+                            <?= $block->languageFileToName($currentFile) ?>
+                        <?php else : ?>
+                            <?= 'Select a language' ?>
+                        <?php endif ?>
+                    </option>
                     <?php foreach ($languageFiles as $language) : ?>
                         <option value="<?= $language ?>"> <?= $block->languageFileToName($language) ?> </option>
                     <?php endforeach; ?>
@@ -57,13 +63,19 @@ $currentFile = $block->getCurrentFile();
             <?php for ($i=0;$i<count($langArray);$i++) : ?>
                 <tr>
                     <td>
-                        <input class="csv-field" type="text" name="editedArray[<?= $i ?>][0]" value="<?= $langArray[$i][0] ?>">
+                        <input class="csv-field" type="text" name="editedArray[<?= $i ?>][0]" value="<?= htmlentities($langArray[$i][0]) ?>">
                     </td>
                     <td>
-                        <input class="csv-field" type="text" name="editedArray[<?= $i ?>][1]" value="<?= $langArray[$i][1] ?>">
+                        <input class="csv-field" type="text" name="editedArray[<?= $i ?>][1]" value="<?= htmlentities($langArray[$i][1]) ?>">
+                        <?php if(isset($langArray[$i][2])) : ?>
+                            <input type="hidden" name="editedArray[<?= $i ?>][2]" value="<?= $langArray[$i][2] ?>">
+                        <?php endif; ?>
+                        <?php if(isset($langArray[$i][3])) : ?>
+                            <input type="hidden" name="editedArray[<?= $i ?>][3]" value="<?= $langArray[$i][3] ?>">
+                        <?php endif; ?>
                     </td>
                     <td>
-                        <button class="delete-button" title="Click to delete line" type="submit" name="delete_line" form="delete-line" value="<?= $langArray[$i][0] ?>">
+                        <button class="delete-button" title="Click to delete line" type="submit" name="delete_line" form="delete-line" value="<?= htmlentities($langArray[$i][0]) ?>">
                             &#128465;
                         </button>
                     </td>

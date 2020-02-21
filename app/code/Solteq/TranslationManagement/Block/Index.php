@@ -74,10 +74,20 @@ class Index extends \Magento\Framework\View\Element\Template
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
                 if ($data[0] != $lineToDelete) {
-                    $langArray[] = array(
-                        $data[0],
-                        $data[1]
-                    );
+                    if(isset($data[2]) && isset($data[3])) {
+                        $langArray[] = array(
+                            $data[0],
+                            $data[1],
+                            $data[2],
+                            $data[3]
+                        );
+                    }
+                    else {
+                        $langArray[] = array(
+                            $data[0],
+                            $data[1],
+                        );
+                    }
                 }
             }
             fclose($langFile);
@@ -100,10 +110,20 @@ class Index extends \Magento\Framework\View\Element\Template
     {
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
-                $langArray[] = array(
-                    $data[0],
-                    $data[1]
-                );
+                if(isset($data[2]) && isset($data[3])) {
+                    $langArray[] = array(
+                        $data[0],
+                        $data[1],
+                        $data[2],
+                        $data[3]
+                    );
+                }
+                else {
+                    $langArray[] = array(
+                        $data[0],
+                        $data[1],
+                    );
+                }
             }
             fclose($langFile);
         }
@@ -123,12 +143,14 @@ class Index extends \Magento\Framework\View\Element\Template
             $split = explode('app/code/', $languageFile);
             $split = explode('/', $split[1]);
             return 'Module: ' . $split[0] . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
-        } else {
-            if (strpos($languageFile, '/design')) {
+        } else if (strpos($languageFile, '/design')) {
                 $split = explode('app/design/', $languageFile);
                 $split = explode('/', $split[1]);
                 return 'Design: ' . ucfirst($split[0]) . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
-            }
+        } else if (strpos($languageFile, '/i18n')) {
+            $split = explode('app/i18n/', $languageFile);
+            $split = explode('/', $split[1]);
+            return 'Main: ' . $nameList[substr($languageFile, -9)];
         }
         return;
     }
