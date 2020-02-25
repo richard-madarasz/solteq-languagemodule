@@ -9,6 +9,26 @@ $currentFile = $block->getCurrentFile();
     <?= include 'css/translations.css'; ?>
 </style>
 
+<script>
+    require(['jquery', 'jquery/ui'], function($){
+        $( document ).ready(function() {
+
+            //wait until the last element (.payment-method) being rendered
+            var existCondition = setInterval(function() {
+                if ($('.modal-component').length) {
+                    clearInterval(existCondition);
+                    runMyFunction();
+                }
+            }, 100);
+
+            function runMyFunction(){
+                console.log("Last");
+            }
+
+        });
+    });
+</script>
+
 <div class="page-main-actions sticky">
     <div class="page-actions" data-ui-id="page-actions-toolbar-content-header">
         <div class="page-actions-inner" data-title="Edit translations">
