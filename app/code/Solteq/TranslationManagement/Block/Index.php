@@ -74,27 +74,9 @@ class Index extends \Magento\Framework\View\Element\Template
 
     function deleteLine($languageFile, $lineToDelete)
     {
-        if (($langFile = fopen($languageFile, "r")) !== false) {
-            while (($data = fgetcsv($langFile, 0, ",")) !== false) {
-                if(isset($data[2]) && isset($data[3])) {
-                    $langArray[] = array(
-                        $data[0],
-                        $data[1],
-                        $data[2],
-                        $data[3]
-                    );
-                }
-                else {
-                    $langArray[] = array(
-                        $data[0],
-                        $data[1],
-                    );
-                }
-            }
-            fclose($langFile);
-        }
-
+        $langArray = $this->openLanguageFile($languageFile);
         $model = $this->translationFactory->create();
+
         if(isset($langArray[$lineToDelete][2]) && isset($langArray[$lineToDelete][3])) {
             $model->load(hash('ripemd160', $langArray[$lineToDelete][0] . $languageFile . $langArray[$lineToDelete][2] . $langArray[$lineToDelete][3]));
         }
@@ -193,6 +175,25 @@ class Index extends \Magento\Framework\View\Element\Template
             }
             $model->save();
         }
+    }
+
+    public function loadFromDatabase()
+    {
+        $model = $this->translationFactory->create();
+        $collection = $model->getCollection();
+        $databaseArray = [];
+        foreach ($collection as $data) {
+            $databaseArray[$data['location']][] = [
+                $data['string'],
+                $data['translation'],
+                $data['parent_type'],
+                $data['parent_name']
+            ];
+        }
+        foreach ($databaseArray as $key => $lines) {
+            $this->saveLanguageFile($lines, $key);
+        }
+        return;
     }
 
     public function getCurrentFile()

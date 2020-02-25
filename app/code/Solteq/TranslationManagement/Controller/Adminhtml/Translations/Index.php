@@ -42,6 +42,7 @@ class Index extends Action
             'newLine' => $this->getRequest()->getParam('new_line'),
             'deleteLine' => $this->getRequest()->getParam('delete_line'),
             'editedArray' => $this->getRequest()->getParam('editedArray'),
+            'loadFromDatabase' => $this->getRequest()->getParam('load_database'),
         ];
 
         if(isset($postparams['langFile'])) {
@@ -61,7 +62,12 @@ class Index extends Action
 
         if(isset($postparams['editedArray'])) {
             $block->saveLanguageFile($postparams['editedArray'],$postparams['langFile']);
+            $block->saveLanguageFile($postparams['editedArray'],$postparams['langFile']);
             $block->saveToDatabase($postparams['editedArray'],$postparams['langFile']);
+        }
+
+        if (isset($postparams['loadFromDatabase'])) {
+            $block->loadFromDatabase();
         }
 
 

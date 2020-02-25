@@ -49,6 +49,9 @@ $currentFile = $block->getCurrentFile();
                 <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>" />
             </form>
             <div class="page-actions-buttons">
+                <button value="langTable" id="load_database" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="Load from Database" type="submit" form="load-database" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
+                    <span class="ui-button-text"> Load from database </span>
+                </button>
                 <button id="save" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" title="Save Attribute" type="submit" form="save-edit" data-ui-id="attribute-edit-content-save-button" role="button" aria-disabled="false">
                     <span class="ui-button-text"> Save </span>
                 </button>
@@ -71,6 +74,12 @@ $currentFile = $block->getCurrentFile();
 <form id="delete-line" method="post" action="">
     <input type="hidden" name="lang_file" value="<?= $currentFile ?>" />
     <input type="hidden" name="form_key" value="<?= $block->getFormKey() ?>" />
+</form>
+
+<form id="load-database" method="post" action="">
+    <input type="hidden" name="load_database" value="Load" />
+    <input type="hidden" name="lang_file" value="<?= $currentFile ?>" />
+    <input type="hidden" name="form_key" value="<?= $block->getFormKey()?>" />
 </form>
 
 <table id="editable_table">
