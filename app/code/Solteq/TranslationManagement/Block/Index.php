@@ -7,6 +7,7 @@ use Mageplaza\HelloWorld\Model\PostFactory;
 use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\Registry;
+use Solteq\TranslationManagement\Model\TranslationFactory;
 
 /**
  * @property PostFactory _postFactory
@@ -24,12 +25,14 @@ class Index extends \Magento\Framework\View\Element\Template
         PostFactory $postFactory,
         FormKey $formKey,
         DirectoryList $dir,
-        Registry $registry
+        Registry $registry,
+        TranslationFactory $translationFactory
     ) {
         $this->_postFactory = $postFactory;
         $this->formKey = $formKey;
         $this->dir = $dir;
         $this->registry = $registry;
+        $this->translationFactory = $translationFactory;
         parent::__construct($context);
     }
 
@@ -90,6 +93,16 @@ class Index extends \Magento\Framework\View\Element\Template
             }
             fclose($langFile);
         }
+
+        $model = $this->translationFactory->create();
+        if(isset($langArray[$lineToDelete][2]) && isset($langArray[$lineToDelete][3])) {
+            $model->load(hash('ripemd160', $langArray[$lineToDelete][0] . $languageFile . $langArray[$lineToDelete][2] . $langArray[$lineToDelete][3]));
+        }
+        else {
+            $model->load(hash('ripemd160', $langArray[$lineToDelete][0] . $languageFile));
+
+        }
+        $model->delete();
         unset($langArray[$lineToDelete]);
         $this->saveLanguageFile($langArray, $languageFile);
     }
@@ -153,6 +166,33 @@ class Index extends \Magento\Framework\View\Element\Template
             return 'Main Project Translation: ' . $nameList[substr($languageFile, -9)];
         }
         return;
+    }
+
+    function saveToDatabase($langArray, $file)
+    {
+        $model = $this->translationFactory->create();
+        foreach ($langArray as  $line) {
+            if(isset($line[2]) && isset($line[3])) {
+                $model->addData([
+                    'id' => hash('ripemd160', $line[0] . $file . $line[2] . $line[3]),
+                    'string' => $line[0],
+                    'translation' => $line[1],
+                    'location' => $file,
+                    'parent_type' => $line[2],
+                    'parent_name' => $line[3]
+                ]);
+            }
+            else {
+                $id = hash('ripemd160', $line[0] . $file);
+                $model->addData([
+                    'id' => $id,
+                    'string' => $line[0],
+                    'translation' => $line[1],
+                    'location' => $file,
+                ]);
+            }
+            $model->save();
+        }
     }
 
     public function getCurrentFile()

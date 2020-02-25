@@ -61,34 +61,7 @@ class Index extends Action
 
         if(isset($postparams['editedArray'])) {
             $block->saveLanguageFile($postparams['editedArray'],$postparams['langFile']);
-            $langArray = $postparams['editedArray'];
-            $file = $postparams['langFile'];
-
-            foreach ($langArray as  $line) {
-                if(isset($line[2]) && isset($line[3])) {
-                    echo hash('ripemd160', $file);
-                    $model->addData([
-//                        'string' => $line[0] .' /****/ '. $line[1] .' /****/ '. $file .' /****/ '. $line[2] .' /****/ '.  $line[3],
-                        'id' => hash('ripemd160', $line[0] . $file . $line[2] . $line[3]),
-                        'string' => $line[0],
-                        'translation' => $line[1],
-                        'location' => $file,
-                        'parent_type' => $line[2],
-                        'parent_name' => $line[3]
-                    ]);
-                }
-                else {
-//                    echo hash('ripemd160', $line[0] . line[1] . $file);
-                    $id = hash('ripemd160', $line[0] . $file);
-                    $model->addData([
-                        'id' => $id,
-                        'string' => $line[0],
-                        'translation' => $line[1],
-                        'location' => $file,
-                    ]);
-                }
-                $model->save();
-            }
+            $block->saveToDatabase($postparams['editedArray'],$postparams['langFile']);
         }
 
 
