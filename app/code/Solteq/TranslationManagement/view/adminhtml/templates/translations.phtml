@@ -10,24 +10,21 @@ $currentFile = $block->getCurrentFile();
 </style>
 
 <script>
-    require(['jquery', 'jquery/ui'], function($){
+    require(['jquery', 'jquery/ui', 'loader'], function($){
         $( document ).ready(function() {
-
-            //wait until the last element (.payment-method) being rendered
-            var existCondition = setInterval(function() {
-                if ($('.modal-component').length) {
-                    clearInterval(existCondition);
-                    runMyFunction();
-                }
-            }, 100);
-
-            function runMyFunction(){
-                console.log("Last");
-            }
-
+            $(document).ajaxStop(function () {
+                $("#pageloader").hide();
+            });
         });
     });
 </script>
+
+<div  id="pageloader" class="pageloader-mask" data-role="loader">
+    <div class="pageloader-icon">
+        <img src="<?= /* @escapeNotVerified */ $block->getViewFileUrl('images/loader-1.gif') ?>"
+             alt="<?= /* @escapeNotVerified */__('Loading...') ?>" style="position: center;"/>
+    </div>
+</div>
 
 <div class="page-main-actions sticky">
     <div class="page-actions" data-ui-id="page-actions-toolbar-content-header">
