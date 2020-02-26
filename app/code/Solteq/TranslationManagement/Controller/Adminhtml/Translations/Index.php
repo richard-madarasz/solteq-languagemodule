@@ -5,38 +5,71 @@ namespace Solteq\TranslationManagement\Controller\Adminhtml\Translations;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Registry;
+use Solteq\TranslationManagement\Model\TranslationFactory;
 
 class Index extends Action
 {
     protected $resultPageFactory = false;
+    protected $translationFactory;
 
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        PageFactory $resultPageFactory,
+        TranslationFactory $translationFactory,
+
+        Registry $registry
     ) {
         parent::__construct($context);
+        $this->registry = $registry;
         $this->resultPageFactory = $resultPageFactory;
+        $this->translationFactory = $translationFactory;
     }
 
     public function execute()
     {
-        $number = $this->getRequest()->getParam('number');
-
         $resultPage = $this->resultPageFactory->create();
-        // $resultPage->setActiveMenu('Solteq_TranslationManagement::menu');
         $resultPage->getConfig()->getTitle()->prepend((__('Translations')));
+        $model = $this->translationFactory->create();
 
-//        $messageBlock = $resultPage->getLayout()->createBlock(
-//            'Magento\Framework\View\Element\Messages',
-//            'answer'
-//        );
-//            $messageBlock->addSuccess($number . ' times 2 is ' . ($number * 2));
-//
-//        $resultPage->getLayout()->setChild(
-//            'content',
-//            $messageBlock->getNameInLayout(),
-//            'answer_alias'
-//        );
+        $block = $this->resultPageFactory
+            ->create()
+            ->getLayout()
+            ->createBlock('Solteq\TranslationManagement\Block\Index');
+
+        $postparams = [
+            'langFile' => $this->getRequest()->getParam('lang_file'),
+            'newLine' => $this->getRequest()->getParam('new_line'),
+            'deleteLine' => $this->getRequest()->getParam('delete_line'),
+            'editedArray' => $this->getRequest()->getParam('editedArray'),
+            'loadFromDatabase' => $this->getRequest()->getParam('load_database'),
+        ];
+
+        if(isset($postparams['langFile'])) {
+            $this->registry->register('currentFile',$postparams['langFile']);
+        }
+
+        if(isset($postparams['newLine'])) {
+            $block->newLine($postparams['langFile']);
+        }
+
+        if(isset($postparams['deleteLine'])) {
+            $block->deleteLine($postparams['langFile'], $postparams['deleteLine']);
+
+            $model->load($postparams['deleteLine'], 'string', $postparams['deleteLine'], 'translation');
+            $model->delete();
+        }
+
+        if(isset($postparams['editedArray'])) {
+            $block->saveLanguageFile($postparams['editedArray'],$postparams['langFile']);
+            $block->saveLanguageFile($postparams['editedArray'],$postparams['langFile']);
+            $block->saveToDatabase($postparams['editedArray'],$postparams['langFile']);
+        }
+
+        if (isset($postparams['loadFromDatabase'])) {
+            $block->loadFromDatabase();
+        }
+
 
         return $resultPage;
     }

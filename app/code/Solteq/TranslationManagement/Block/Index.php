@@ -2,17 +2,37 @@
 
 namespace Solteq\TranslationManagement\Block;
 
+use Magento\Framework\View\Element\Template\Context;
+use Mageplaza\HelloWorld\Model\PostFactory;
+use Magento\Framework\Data\Form\FormKey;
+use Magento\Framework\Filesystem\DirectoryList;
+use Magento\Framework\Registry;
+use Solteq\TranslationManagement\Model\TranslationFactory;
+
+/**
+ * @property PostFactory _postFactory
+ * @property FormKey formKey
+ * @property DirectoryList dir
+ */
+
 class Index extends \Magento\Framework\View\Element\Template
 {
     protected $_languageFiles = [];
+    protected $_currentFile;
 
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Mageplaza\HelloWorld\Model\PostFactory $postFactory,
-        \Magento\Framework\Data\Form\FormKey $formKey
+        Context $context,
+        PostFactory $postFactory,
+        FormKey $formKey,
+        DirectoryList $dir,
+        Registry $registry,
+        TranslationFactory $translationFactory
     ) {
         $this->_postFactory = $postFactory;
         $this->formKey = $formKey;
+        $this->dir = $dir;
+        $this->registry = $registry;
+        $this->translationFactory = $translationFactory;
         parent::__construct($context);
     }
 
@@ -23,9 +43,7 @@ class Index extends \Magento\Framework\View\Element\Template
 
     public function findLanguageFiles()
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList')->getRoot() . '/app';
-        $this->listFolderFiles($directory);
+        $this->listFolderFiles($this->dir->getPath('app'));
         return $this->_languageFiles;
     }
 
@@ -56,17 +74,18 @@ class Index extends \Magento\Framework\View\Element\Template
 
     function deleteLine($languageFile, $lineToDelete)
     {
-        if (($langFile = fopen($languageFile, "r")) !== false) {
-            while (($data = fgetcsv($langFile, 0, ",")) !== false) {
-                if ($data[0] != $lineToDelete) {
-                    $langArray[] = array(
-                        $data[0],
-                        $data[1]
-                    );
-                }
-            }
-            fclose($langFile);
+        $langArray = $this->openLanguageFile($languageFile);
+        $model = $this->translationFactory->create();
+
+        if(isset($langArray[$lineToDelete][2]) && isset($langArray[$lineToDelete][3])) {
+            $model->load(hash('ripemd160', $langArray[$lineToDelete][0] . $languageFile . $langArray[$lineToDelete][2] . $langArray[$lineToDelete][3]));
         }
+        else {
+            $model->load(hash('ripemd160', $langArray[$lineToDelete][0] . $languageFile));
+
+        }
+        $model->delete();
+        unset($langArray[$lineToDelete]);
         $this->saveLanguageFile($langArray, $languageFile);
     }
 
@@ -83,12 +102,23 @@ class Index extends \Magento\Framework\View\Element\Template
 
     function openLanguageFile($languageFile)
     {
+        $langArray = [];
         if (($langFile = fopen($languageFile, "r")) !== false) {
             while (($data = fgetcsv($langFile, 0, ",")) !== false) {
-                $langArray[] = array(
-                    $data[0],
-                    $data[1]
-                );
+                if(isset($data[2]) && isset($data[3])) {
+                    $langArray[] = array(
+                        $data[0],
+                        $data[1],
+                        $data[2],
+                        $data[3]
+                    );
+                }
+                else {
+                    $langArray[] = array(
+                        $data[0],
+                        $data[1],
+                    );
+                }
             }
             fclose($langFile);
         }
@@ -108,13 +138,66 @@ class Index extends \Magento\Framework\View\Element\Template
             $split = explode('app/code/', $languageFile);
             $split = explode('/', $split[1]);
             return 'Module: ' . $split[0] . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
-        } else {
-            if (strpos($languageFile, '/design')) {
+        } else if (strpos($languageFile, '/design')) {
                 $split = explode('app/design/', $languageFile);
                 $split = explode('/', $split[1]);
                 return 'Design: ' . ucfirst($split[0]) . ' - ' . $split[1] . ' - ' . $nameList[substr($languageFile, -9)];
-            }
+        } else if (strpos($languageFile, '/i18n')) {
+            $split = explode('app/i18n/', $languageFile);
+            $split = explode('/', $split[1]);
+            return 'Main Project Translation: ' . $nameList[substr($languageFile, -9)];
         }
         return;
+    }
+
+    function saveToDatabase($langArray, $file)
+    {
+        $model = $this->translationFactory->create();
+        foreach ($langArray as  $line) {
+            if(isset($line[2]) && isset($line[3])) {
+                $model->addData([
+                    'id' => hash('ripemd160', $line[0] . $file . $line[2] . $line[3]),
+                    'string' => $line[0],
+                    'translation' => $line[1],
+                    'location' => $file,
+                    'parent_type' => $line[2],
+                    'parent_name' => $line[3]
+                ]);
+            }
+            else {
+                $id = hash('ripemd160', $line[0] . $file);
+                $model->addData([
+                    'id' => $id,
+                    'string' => $line[0],
+                    'translation' => $line[1],
+                    'location' => $file,
+                ]);
+            }
+            $model->save();
+        }
+    }
+
+    public function loadFromDatabase()
+    {
+        $model = $this->translationFactory->create();
+        $collection = $model->getCollection();
+        $databaseArray = [];
+        foreach ($collection as $data) {
+            $databaseArray[$data['location']][] = [
+                $data['string'],
+                $data['translation'],
+                $data['parent_type'],
+                $data['parent_name']
+            ];
+        }
+        foreach ($databaseArray as $key => $lines) {
+            $this->saveLanguageFile($lines, $key);
+        }
+        return;
+    }
+
+    public function getCurrentFile()
+    {
+        return $this->registry->registry('currentFile');
     }
 }
